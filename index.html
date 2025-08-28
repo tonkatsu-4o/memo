@@ -249,6 +249,7 @@
         };
         
         let saveTimeout;
+        let hasAttemptedSilentLogin = false;
 
         const generateUUID = () => crypto.randomUUID();
 
@@ -279,22 +280,34 @@
                 discoveryDocs: DISCOVERY_DOCS,
             });
             state.isGapiReady = true;
-            updateAuthButtons();
-            // If a token exists, it means the user was previously signed in.
-            // Automatically try to load their data from Drive.
-            if (gapi.client.getToken()) {
-                await loadFromDrive();
-            }
+            trySilentSignIn();
         };
 
         const gisLoaded = () => {
             state.tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
                 scope: SCOPES,
-                callback: '', // Callback is handled dynamically
+                callback: tokenCallback,
             });
             state.isGsiReady = true;
+            trySilentSignIn();
+        };
+
+        const trySilentSignIn = () => {
+            if (state.isGapiReady && state.isGsiReady && !hasAttemptedSilentLogin) {
+                hasAttemptedSilentLogin = true;
+                state.tokenClient.requestAccessToken({ prompt: '' });
+            }
+        };
+        
+        const tokenCallback = async (resp) => {
+            if (resp.error !== undefined) {
+                console.log('Silent sign-in failed or user not signed in.');
+                updateAuthButtons();
+                return;
+            }
             updateAuthButtons();
+            await loadFromDrive();
         };
 
         const handleAuthClick = () => {
@@ -303,19 +316,7 @@
                 return;
             }
             if (!state.tokenClient) return;
-
-            state.tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) throw (resp);
-                updateAuthButtons();
-                await loadFromDrive(); // Load data after successful sign-in
-            };
-
-            // Prompt the user for consent if they are not already signed in
-            if (gapi.client.getToken() === null) {
-                state.tokenClient.requestAccessToken({ prompt: 'consent' });
-            } else {
-                state.tokenClient.requestAccessToken({ prompt: '' });
-            }
+            state.tokenClient.requestAccessToken({ prompt: 'consent' });
         };
 
         const handleSignoutClick = () => {
@@ -356,7 +357,6 @@
                         fields: 'id',
                     });
                     driveFileId = createResponse.result.id;
-                    // Save current (potentially empty or local) data to the new file
                     await saveToDrive(); 
                 }
             } catch (error) {
@@ -388,7 +388,6 @@
             try {
                 const response = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
                 const driveData = response.result;
-                // Check if the file has content and is a valid array
                 if (Array.isArray(driveData)) {
                     state.items = driveData;
                     localStorage.setItem('memoAppData', JSON.stringify(state.items));
@@ -398,7 +397,6 @@
             } catch (error) {
                 console.error('Error loading from Drive:', error);
                 setSyncStatus('Driveからの読込に失敗');
-                // If loading fails, fall back to local data
                 loadLocalData();
                 render();
             }
