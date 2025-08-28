@@ -74,6 +74,9 @@
                     <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 17.66 1.41-1.41"/><path d="m17.66 4.93 1.41-1.41"/></svg>
                     <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon hidden"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                 </button>
+                 <button id="trash-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
                 <!-- Google Drive Authentication Buttons -->
                 <button id="authorize_button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">Google Driveにサインイン</button>
                 <button id="signout_button" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">サインアウト</button>
@@ -145,6 +148,25 @@
                 <!-- The actual editor area -->
                 <div id="editor" contenteditable="true" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"></div>
             </div>
+            
+            <!-- Trash View -->
+            <div id="trash-view" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">ゴミ箱</h2>
+                    <button id="back-to-home-from-trash" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                        戻る
+                    </button>
+                </div>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">ゴミ箱内のアイテムは30日後に自動的に削除されます。</p>
+                <div id="trash-items-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Trashed items will be dynamically inserted here -->
+                </div>
+                <div id="trash-empty-state" class="hidden text-center py-16">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto text-slate-400 dark:text-slate-500 mb-4"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                    <p class="text-slate-500 dark:text-slate-400">ゴミ箱は空です。</p>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -169,11 +191,11 @@
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
-            <h3 class="text-xl font-bold mb-2 text-center dark:text-slate-100">アイテムの削除</h3>
-            <p class="text-slate-600 dark:text-slate-400 mb-6 text-center">本当に削除しますか？<br>この操作は取り消せません。</p>
+            <h3 id="delete-modal-title" class="text-xl font-bold mb-2 text-center dark:text-slate-100"></h3>
+            <p id="delete-modal-text" class="text-slate-600 dark:text-slate-400 mb-6 text-center"></p>
             <div class="flex justify-center gap-4">
                 <button id="cancel-delete-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
-                <button id="confirm-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32">削除</button>
+                <button id="confirm-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32"></button>
             </div>
         </div>
     </div>
@@ -189,6 +211,18 @@
             </div>
         </div>
     </div>
+    
+    <!-- Move Modal -->
+    <div id="move-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md modal-enter">
+            <h3 class="text-xl font-bold mb-4 text-center dark:text-slate-100">移動先を選択</h3>
+            <div id="move-destinations-list" class="max-h-60 overflow-y-auto no-scrollbar">
+                <!-- Destination list will be populated here -->
+            </div>
+            <button id="cancel-move-btn" class="mt-6 w-full bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors">キャンセル</button>
+        </div>
+    </div>
+
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -204,18 +238,23 @@
         // --- DOM Elements ---
         const homeView = document.getElementById('home-view');
         const editorView = document.getElementById('editor-view');
+        const trashView = document.getElementById('trash-view');
         const itemsList = document.getElementById('items-list');
+        const trashItemsList = document.getElementById('trash-items-list');
         const createBtn = document.getElementById('create-btn');
         const backToHomeBtn = document.getElementById('back-to-home');
+        const backToHomeFromTrashBtn = document.getElementById('back-to-home-from-trash');
         const editor = document.getElementById('editor');
         const noteTitleInput = document.getElementById('note-title');
         const sortSelect = document.getElementById('sort-select');
         const breadcrumb = document.getElementById('breadcrumb');
         const emptyState = document.getElementById('empty-state');
+        const trashEmptyState = document.getElementById('trash-empty-state');
         const syncStatus = document.getElementById('sync-status');
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeIconLight = document.getElementById('theme-icon-light');
         const themeIconDark = document.getElementById('theme-icon-dark');
+        const trashBtn = document.getElementById('trash-btn');
         
         // Modals
         const createModal = document.getElementById('create-modal');
@@ -223,12 +262,17 @@
         const createFolderBtn = document.getElementById('create-folder-btn');
         const cancelCreateBtn = document.getElementById('cancel-create-btn');
         const deleteModal = document.getElementById('delete-modal');
+        const deleteModalTitle = document.getElementById('delete-modal-title');
+        const deleteModalText = document.getElementById('delete-modal-text');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
         const renameModal = document.getElementById('rename-modal');
         const renameInput = document.getElementById('rename-input');
         const cancelRenameBtn = document.getElementById('cancel-rename-btn');
         const confirmRenameBtn = document.getElementById('confirm-rename-btn');
+        const moveModal = document.getElementById('move-modal');
+        const moveDestinationsList = document.getElementById('move-destinations-list');
+        const cancelMoveBtn = document.getElementById('cancel-move-btn');
 
         // Google Auth Buttons
         const authorizeButton = document.getElementById('authorize_button');
@@ -246,6 +290,7 @@
             tokenClient: null,
             deleteCandidateId: null,
             renameCandidateId: null,
+            moveCandidateId: null,
         };
         
         let saveTimeout;
@@ -419,18 +464,25 @@
             if (state.currentView === 'home') {
                 homeView.classList.remove('hidden');
                 editorView.classList.add('hidden');
+                trashView.classList.add('hidden');
                 renderItemsList();
                 updateBreadcrumb();
-            } else {
+            } else if (state.currentView === 'editor') {
                 homeView.classList.add('hidden');
                 editorView.classList.remove('hidden');
+                trashView.classList.add('hidden');
                 renderEditor();
+            } else if (state.currentView === 'trash') {
+                homeView.classList.add('hidden');
+                editorView.classList.add('hidden');
+                trashView.classList.remove('hidden');
+                renderTrashList();
             }
         };
         
         const renderItemsList = () => {
             itemsList.innerHTML = '';
-            const filteredItems = state.items.filter(item => item.parentId === state.currentParentId);
+            const filteredItems = state.items.filter(item => item.parentId === state.currentParentId && !item.isTrashed);
             emptyState.classList.toggle('hidden', filteredItems.length > 0);
 
             const sortedItems = [...filteredItems].sort((a, b) => {
@@ -456,24 +508,64 @@
                 const pinIconColor = item.isPinned ? 'text-yellow-400' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300';
                 
                 const editButtonHTML = `<button class="edit-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil text-slate-400 hover:text-blue-500 dark:hover:text-blue-400"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>`;
+                const moveButtonHTML = `<button class="move-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-output text-slate-400 hover:text-green-500 dark:hover:text-green-400"><path d="M2 7.5a2.5 2.5 0 0 1 2.5-2.5h2.78a2 2 0 0 1 1.6.8L9.25 7.5H19a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1-2.5 2.5H4.5A2.5 2.5 0 0 1 2 17Z"/><path d="M12 19v-6"/><path d="m15 16-3-3-3 3"/></svg></button>`;
 
                 itemEl.innerHTML = `
                     ${icon}
                     <h3 class="font-semibold truncate text-slate-800 dark:text-slate-200">${item.title || '無題'}</h3>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${new Date(item.createdAt).toLocaleString('ja-JP')}</p>
                     <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${moveButtonHTML}
                         ${editButtonHTML}
                         <button class="pin-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="${pinIconColor}"><path d="M16 3.1c-.6-1-1.8-1.4-2.8-1.1-1 .3-1.8 1.1-2.1 2.1-.3 1 .1 2.2 1.1 2.8l-5.6 5.6c-.4.4-.4 1 0 1.4l2.8 2.8c.4.4 1 .4 1.4 0l5.6-5.6c.7.9 1.8 1.2 2.8 1.1 1-.3 1.8-1.1 2.1-2.1.3-1-.1-2.2-1.1-2.8L16 3.1zM12 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></button>
                         <button class="delete-btn p-1.5 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 text-slate-400 hover:text-red-500"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
                     </div>`;
                 
                 itemEl.addEventListener('click', (e) => {
-                    if (e.target.closest('.delete-btn, .pin-btn, .edit-btn')) return;
+                    if (e.target.closest('.delete-btn, .pin-btn, .edit-btn, .move-btn')) return;
                     handleItemClick(item.id);
                 });
                 itemsList.appendChild(itemEl);
             });
         };
+
+        const renderTrashList = () => {
+            trashItemsList.innerHTML = '';
+            const trashedItems = state.items.filter(item => item.isTrashed);
+            trashEmptyState.classList.toggle('hidden', trashedItems.length > 0);
+
+            trashedItems.sort((a, b) => new Date(b.trashedAt) - new Date(a.trashedAt));
+
+            trashedItems.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center';
+                itemEl.dataset.id = item.id;
+
+                const isFolder = item.type === 'folder';
+                const icon = isFolder 
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder mb-2 text-yellow-500"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>`
+                    : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text mb-2 text-blue-500"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`;
+
+                itemEl.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        ${icon}
+                        <div>
+                            <h3 class="font-semibold truncate text-slate-800 dark:text-slate-200">${item.title || '無題'}</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">削除日: ${new Date(item.trashedAt).toLocaleString('ja-JP')}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="restore-btn p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}" title="復元">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw text-green-500"><path d="M3 2v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>
+                        </button>
+                        <button class="perm-delete-btn p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" data-id="${item.id}" title="完全に削除">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 text-red-500"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
+                    </div>`;
+                trashItemsList.appendChild(itemEl);
+            });
+        };
+
 
         const renderEditor = () => {
             const item = state.items.find(i => i.id === state.editingItemId);
@@ -532,6 +624,8 @@
                 updatedAt: new Date().toISOString(),
                 isPinned: false,
                 parentId: state.currentParentId,
+                isTrashed: false,
+                trashedAt: null
             };
             state.items.push(newItem);
             saveData();
@@ -608,11 +702,21 @@
 
         backToHomeBtn.addEventListener('click', () => {
             state.currentView = 'home';
-            state.editingItemId = null;
+            render();
+        });
+        backToHomeFromTrashBtn.addEventListener('click', () => {
+            state.currentView = 'home';
             render();
         });
 
         noteTitleInput.addEventListener('input', updateNote);
+        
+        editor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+
         editor.addEventListener('input', updateNote);
         sortSelect.addEventListener('change', (e) => { state.sortBy = e.target.value; render(); });
 
@@ -646,7 +750,7 @@
         });
 
         itemsList.addEventListener('click', (e) => {
-            const targetBtn = e.target.closest('.pin-btn, .delete-btn, .edit-btn');
+            const targetBtn = e.target.closest('.pin-btn, .delete-btn, .edit-btn, .move-btn');
             if (!targetBtn) return;
             
             e.preventDefault();
@@ -662,8 +766,13 @@
                     render();
                 }
             } else if (targetBtn.classList.contains('delete-btn')) {
-                state.deleteCandidateId = id;
-                showModal(deleteModal);
+                const item = state.items.find(i => i.id === id);
+                if (item) {
+                    item.isTrashed = true;
+                    item.trashedAt = new Date().toISOString();
+                    saveData();
+                    render();
+                }
             } else if (targetBtn.classList.contains('edit-btn')) {
                 const itemToEdit = state.items.find(i => i.id === id);
                 if (!itemToEdit) return;
@@ -672,24 +781,42 @@
                 showModal(renameModal);
                 renameInput.focus();
                 renameInput.select();
+            } else if (targetBtn.classList.contains('move-btn')) {
+                state.moveCandidateId = id;
+                populateMoveModal(id);
+                showModal(moveModal);
+            }
+        });
+
+        trashItemsList.addEventListener('click', (e) => {
+            const targetBtn = e.target.closest('.restore-btn, .perm-delete-btn');
+            if (!targetBtn) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            const id = targetBtn.dataset.id;
+
+            if (targetBtn.classList.contains('restore-btn')) {
+                const item = state.items.find(i => i.id === id);
+                if (item) {
+                    item.isTrashed = false;
+                    item.trashedAt = null;
+                    saveData();
+                    render();
+                }
+            } else if (targetBtn.classList.contains('perm-delete-btn')) {
+                state.deleteCandidateId = id;
+                deleteModalTitle.textContent = '完全に削除';
+                deleteModalText.innerHTML = '本当に完全に削除しますか？<br>この操作は取り消せません。';
+                confirmDeleteBtn.textContent = '完全に削除';
+                showModal(deleteModal);
             }
         });
         
         cancelDeleteBtn.addEventListener('click', () => { hideModal(deleteModal); state.deleteCandidateId = null; });
         confirmDeleteBtn.addEventListener('click', () => {
             if (state.deleteCandidateId) {
-                const deleteIds = [state.deleteCandidateId];
-                const findChildren = (parentId) => {
-                    state.items.forEach(item => {
-                        if (item.parentId === parentId) {
-                            deleteIds.push(item.id);
-                            if (item.type === 'folder') findChildren(item.id);
-                        }
-                    });
-                };
-                findChildren(state.deleteCandidateId);
-                
-                state.items = state.items.filter(item => !deleteIds.includes(item.id));
+                state.items = state.items.filter(item => item.id !== state.deleteCandidateId);
                 saveData();
                 render();
             }
@@ -724,6 +851,65 @@
                 cancelRenameBtn.click();
             }
         });
+
+        const getDescendantFolderIds = (folderId) => {
+            const descendantIds = [];
+            const findChildren = (parentId) => {
+                const children = state.items.filter(item => item.parentId === parentId);
+                children.forEach(child => {
+                    if (child.type === 'folder') {
+                        descendantIds.push(child.id);
+                        findChildren(child.id);
+                    }
+                });
+            };
+            findChildren(folderId);
+            return descendantIds;
+        };
+
+        const populateMoveModal = (itemId) => {
+            moveDestinationsList.innerHTML = '';
+            const itemToMove = state.items.find(i => i.id === itemId);
+            
+            let invalidDestinationIds = [itemId];
+            if (itemToMove.type === 'folder') {
+                invalidDestinationIds = [...invalidDestinationIds, ...getDescendantFolderIds(itemId)];
+            }
+
+            // Add Home destination
+            const homeEl = document.createElement('div');
+            homeEl.className = 'p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md cursor-pointer flex items-center gap-3';
+            homeEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home text-slate-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>ホーム</span>`;
+            homeEl.addEventListener('click', () => moveItem(null));
+            moveDestinationsList.appendChild(homeEl);
+
+            // Add Folder destinations
+            const folders = state.items.filter(item => item.type === 'folder' && !invalidDestinationIds.includes(item.id));
+            folders.forEach(folder => {
+                const folderEl = document.createElement('div');
+                folderEl.className = 'p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md cursor-pointer flex items-center gap-3';
+                folderEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder text-yellow-500"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg><span>${folder.title}</span>`;
+                folderEl.addEventListener('click', () => moveItem(folder.id));
+                moveDestinationsList.appendChild(folderEl);
+            });
+        };
+
+        const moveItem = (destinationId) => {
+            const itemToMove = state.items.find(i => i.id === state.moveCandidateId);
+            if (itemToMove) {
+                itemToMove.parentId = destinationId;
+                itemToMove.updatedAt = new Date().toISOString();
+                saveData();
+                render();
+            }
+            hideModal(moveModal);
+            state.moveCandidateId = null;
+        };
+
+        cancelMoveBtn.addEventListener('click', () => {
+            hideModal(moveModal);
+            state.moveCandidateId = null;
+        });
         
         authorizeButton.addEventListener('click', handleAuthClick);
         signoutButton.addEventListener('click', handleSignoutClick);
@@ -735,9 +921,26 @@
             themeIconDark.classList.toggle('hidden', !isDark);
         });
 
+        trashBtn.addEventListener('click', () => {
+            state.currentView = 'trash';
+            render();
+        });
+
         // --- Initialization ---
         const init = () => {
             loadLocalData();
+            
+            const thirtyDaysAgo = new Date().getTime() - (30 * 24 * 60 * 60 * 1000);
+            const originalLength = state.items.length;
+            state.items = state.items.filter(item => {
+                if (item.isTrashed && item.trashedAt) {
+                    return new Date(item.trashedAt).getTime() > thirtyDaysAgo;
+                }
+                return true;
+            });
+            if (state.items.length < originalLength) {
+                saveData();
+            }
             
             const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (isDark) document.documentElement.classList.add('dark');
