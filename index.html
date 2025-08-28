@@ -133,9 +133,6 @@
                     <button class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="italic">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
                     </button>
-                    <button id="create-link-btn" class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"/></svg>
-                    </button>
                     <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
                     <button class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="undo">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a8.5 8.5 0 1 1-4.13 15.87"/></svg>
@@ -193,28 +190,6 @@
         </div>
     </div>
 
-    <!-- Link Modal -->
-    <div id="link-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
-            <h3 class="text-xl font-bold mb-4 text-center dark:text-slate-100">ハイパーリンクの挿入</h3>
-            <div class="space-y-4">
-                <div>
-                    <label for="link-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">表示するテキスト</label>
-                    <input type="text" id="link-text" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-slate-200">
-                </div>
-                <div>
-                    <label for="link-url" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">URL</label>
-                    <input type="url" id="link-url" placeholder="https://example.com" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-slate-200">
-                </div>
-            </div>
-            <div class="flex justify-center gap-4 mt-6">
-                <button id="cancel-link-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
-                <button id="confirm-link-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32">OK</button>
-            </div>
-        </div>
-    </div>
-
-
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -254,13 +229,6 @@
         const renameInput = document.getElementById('rename-input');
         const cancelRenameBtn = document.getElementById('cancel-rename-btn');
         const confirmRenameBtn = document.getElementById('confirm-rename-btn');
-        const linkModal = document.getElementById('link-modal');
-        const linkTextInput = document.getElementById('link-text');
-        const linkUrlInput = document.getElementById('link-url');
-        const cancelLinkBtn = document.getElementById('cancel-link-btn');
-        const confirmLinkBtn = document.getElementById('confirm-link-btn');
-        const createLinkBtn = document.getElementById('create-link-btn');
-
 
         // Google Auth Buttons
         const authorizeButton = document.getElementById('authorize_button');
@@ -281,7 +249,6 @@
         };
         
         let saveTimeout;
-        let savedSelection = null;
 
         const generateUUID = () => crypto.randomUUID();
 
@@ -659,60 +626,6 @@
                 updateToolbarState(); // Update toolbar after command
             });
         });
-
-        createLinkBtn.addEventListener('click', () => {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                savedSelection = selection.getRangeAt(0).cloneRange();
-                linkTextInput.value = selection.toString();
-            } else {
-                savedSelection = null;
-                linkTextInput.value = '';
-            }
-            linkUrlInput.value = '';
-            showModal(linkModal);
-            linkUrlInput.focus();
-        });
-
-        confirmLinkBtn.addEventListener('click', () => {
-            let url = linkUrlInput.value.trim();
-            let text = linkTextInput.value.trim();
-
-            if (!url || !text) return;
-
-            if (!/^https?:\/\//i.test(url)) {
-                url = 'https://' + url;
-            }
-            
-            editor.focus();
-
-            if (savedSelection) {
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(savedSelection);
-            }
-            
-            const linkHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-            document.execCommand('insertHTML', false, linkHTML);
-            
-            updateNote();
-            hideModal(linkModal);
-            savedSelection = null;
-        });
-
-        cancelLinkBtn.addEventListener('click', () => {
-            hideModal(linkModal);
-            savedSelection = null;
-        });
-
-        linkUrlInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                confirmLinkBtn.click();
-            } else if (e.key === 'Escape') {
-                cancelLinkBtn.click();
-            }
-        });
-
 
         // Add listeners to update the toolbar state based on cursor position
         editor.addEventListener('keyup', updateToolbarState);
