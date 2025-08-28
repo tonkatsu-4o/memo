@@ -7,20 +7,19 @@
     
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ** IMPORTANT: This script enables dark mode for Tailwind CSS ** -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     
-    <!-- Lucide Icons for UI icons -->
-    <script src="https://unpkg.com/lucide-react@0.292.0/dist/lucide-react.js"></script>
-    
-    <!-- Google API Client Library -->
-    <script src="https://apis.google.com/js/api.js"></script>
-
     <style>
         /* Custom styles for the editor and overall look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
         }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         
         /* Hide scrollbar but allow scrolling */
         .no-scrollbar::-webkit-scrollbar {
@@ -35,14 +34,7 @@
         #editor {
             min-height: 400px;
             outline: none;
-            border: 1px solid #e2e8f0; /* slate-200 */
-            padding: 1rem;
-            border-radius: 0.5rem;
             line-height: 1.6;
-        }
-        #editor:focus {
-            border-color: #3b82f6; /* blue-500 */
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
         
         /* Animation for modals */
@@ -66,17 +58,22 @@
         }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 transition-colors duration-300">
 
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         
         <!-- Header Section -->
-        <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
-            <h1 class="text-3xl font-bold text-slate-900 flex items-center">
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+            <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-notebook-tabs mr-3 text-blue-600"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M15 2v20"/><path d="M15 7h5"/><path d="M15 12h5"/><path d="M15 17h5"/></svg>
                 メモ帳アプリ
             </h1>
-            <div>
+            <div class="flex items-center gap-2">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+                    <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 17.66 1.41-1.41"/><path d="m17.66 4.93 1.41-1.41"/></svg>
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon hidden"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
                 <!-- Google Drive Authentication Buttons -->
                 <button id="authorize_button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">Google Driveにサインイン</button>
                 <button id="signout_button" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">サインアウト</button>
@@ -88,16 +85,16 @@
             <!-- Home View: List of notes and folders -->
             <div id="home-view">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                    <div id="breadcrumb" class="text-lg font-medium text-slate-600"></div>
+                    <div id="breadcrumb" class="text-lg font-medium text-slate-600 dark:text-slate-400"></div>
                     <div class="flex items-center gap-2">
                         <div class="relative">
-                            <select id="sort-select" class="appearance-none bg-white border border-slate-300 rounded-md py-2 pl-3 pr-8 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select id="sort-select" class="appearance-none bg-white border border-slate-300 rounded-md py-2 pl-3 pr-8 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200">
                                 <option value="createdAt_desc">作成日順（新しい順）</option>
                                 <option value="createdAt_asc">作成日順（古い順）</option>
                                 <option value="title_asc">名前順（昇順）</option>
                                 <option value="title_desc">名前順（降順）</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700 dark:text-slate-300">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </div>
                         </div>
@@ -111,71 +108,71 @@
                     <!-- Items will be dynamically inserted here -->
                 </div>
                  <div id="empty-state" class="hidden text-center py-16">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-plus-2 mx-auto text-slate-400 mb-4"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M3 15h6"/><path d="M6 12v6"/></svg>
-                    <p class="text-slate-500">アイテムがありません。</p>
-                    <p class="text-slate-500 text-sm mt-1">「作成」ボタンから新しいメモやフォルダを追加しましょう。</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-plus-2 mx-auto text-slate-400 dark:text-slate-500 mb-4"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M3 15h6"/><path d="M6 12v6"/></svg>
+                    <p class="text-slate-500 dark:text-slate-400">アイテムがありません。</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">「作成」ボタンから新しいメモやフォルダを追加しましょう。</p>
                 </div>
             </div>
 
             <!-- Editor View -->
             <div id="editor-view" class="hidden">
                 <div class="flex justify-between items-center mb-4">
-                    <button id="back-to-home" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-200">
+                    <button id="back-to-home" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                         戻る
                     </button>
-                    <div id="sync-status" class="text-sm text-slate-500"></div>
+                    <div id="sync-status" class="text-sm text-slate-500 dark:text-slate-400"></div>
                 </div>
-                <input type="text" id="note-title" placeholder="タイトルを入力..." class="text-3xl font-bold w-full p-2 mb-4 border-b-2 border-slate-200 focus:outline-none focus:border-blue-500 transition-colors">
+                <input type="text" id="note-title" placeholder="タイトルを入力..." class="text-3xl font-bold w-full p-2 mb-4 bg-transparent border-b-2 border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors dark:text-slate-100">
                 
                 <!-- Editor Toolbar -->
-                <div class="flex items-center gap-2 bg-slate-100 p-2 rounded-t-lg border border-b-0 border-slate-200">
-                    <button class="editor-tool-btn" data-command="bold">
+                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-t-lg border border-b-0 border-slate-200 dark:border-slate-700">
+                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="bold">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg>
                     </button>
-                    <button class="editor-tool-btn" data-command="italic">
+                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="italic">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
                     </button>
-                    <div class="w-px h-6 bg-slate-300 mx-2"></div>
-                    <button class="editor-tool-btn" data-command="undo">
+                    <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
+                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="undo">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a8.5 8.5 0 1 1-4.13 15.87"/></svg>
                     </button>
-                    <button class="editor-tool-btn" data-command="redo">
+                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="redo">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo-2"><path d="M15 14 20 9l-5-5"/><path d="M20 9H9.5A8.5 8.5 0 1 0 13.6 21.8"/></svg>
                     </button>
                 </div>
                 
                 <!-- The actual editor area -->
-                <div id="editor" contenteditable="true"></div>
+                <div id="editor" contenteditable="true" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"></div>
             </div>
         </main>
     </div>
 
     <!-- Create New Item Modal -->
     <div id="create-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
-            <h3 class="text-xl font-bold mb-6 text-center">新規作成</h3>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
+            <h3 class="text-xl font-bold mb-6 text-center dark:text-slate-100">新規作成</h3>
             <div class="flex justify-around">
-                <button id="create-note-btn" class="flex flex-col items-center gap-3 p-4 rounded-lg hover:bg-slate-100 transition-colors w-32">
+                <button id="create-note-btn" class="flex flex-col items-center gap-3 p-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors w-32">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text text-blue-500"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                    <span class="font-semibold">メモ</span>
+                    <span class="font-semibold dark:text-slate-200">メモ</span>
                 </button>
-                <button id="create-folder-btn" class="flex flex-col items-center gap-3 p-4 rounded-lg hover:bg-slate-100 transition-colors w-32">
+                <button id="create-folder-btn" class="flex flex-col items-center gap-3 p-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors w-32">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-plus text-yellow-500"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>
-                    <span class="font-semibold">フォルダ</span>
+                    <span class="font-semibold dark:text-slate-200">フォルダ</span>
                 </button>
             </div>
-            <button id="cancel-create-btn" class="mt-6 w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg transition-colors">キャンセル</button>
+            <button id="cancel-create-btn" class="mt-6 w-full bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors">キャンセル</button>
         </div>
     </div>
     
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
-            <h3 class="text-xl font-bold mb-2 text-center">アイテムの削除</h3>
-            <p class="text-slate-600 mb-6 text-center">本当に削除しますか？<br>この操作は取り消せません。</p>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
+            <h3 class="text-xl font-bold mb-2 text-center dark:text-slate-100">アイテムの削除</h3>
+            <p class="text-slate-600 dark:text-slate-400 mb-6 text-center">本当に削除しますか？<br>この操作は取り消せません。</p>
             <div class="flex justify-center gap-4">
-                <button id="cancel-delete-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
+                <button id="cancel-delete-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
                 <button id="confirm-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32">削除</button>
             </div>
         </div>
@@ -186,10 +183,9 @@
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- Google Drive API Configuration ---
-        // IMPORTANT: You need to create your own API Key and Client ID from Google Cloud Platform.
-        // https://console.cloud.google.com/
-        const API_KEY = 'YOUR_API_KEY'; // Replace with your API Key
-        const CLIENT_ID = 'YOUR_CLIENT_ID'; // Replace with your Client ID
+        // IMPORTANT: Replace with your own API Key and Client ID
+        const API_KEY = 'YOUR_API_KEY'; 
+        const CLIENT_ID = 'YOUR_CLIENT_ID';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
         const APP_FILENAME = 'my-notepad-app-data.json';
@@ -207,6 +203,9 @@
         const breadcrumb = document.getElementById('breadcrumb');
         const emptyState = document.getElementById('empty-state');
         const syncStatus = document.getElementById('sync-status');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
         
         // Modals
         const createModal = document.getElementById('create-modal');
@@ -224,26 +223,27 @@
         // --- Application State ---
         let state = {
             items: [],
-            currentView: 'home', // 'home' or 'editor'
-            currentParentId: null, // null for root, or folder ID
+            currentView: 'home',
+            currentParentId: null,
             editingItemId: null,
             sortBy: 'createdAt_desc',
             isGapiReady: false,
             isGsiReady: false,
             tokenClient: null,
-            isSaving: false,
             deleteCandidateId: null,
         };
         
         let saveTimeout;
 
-        // --- Utility Functions ---
         const generateUUID = () => crypto.randomUUID();
 
-        // --- Data Persistence (Local & Google Drive) ---
+        // --- Data Persistence ---
         const saveData = async () => {
+            // Always save to local storage as a backup
             localStorage.setItem('memoAppData', JSON.stringify(state.items));
-            if (gapi.client.getToken() && driveFileId) {
+            
+            // If signed into Google Drive, save there as well
+            if (gapi.client?.getToken && gapi.client.getToken() && driveFileId) {
                 setSyncStatus('保存中...');
                 try {
                     await saveToDrive();
@@ -255,10 +255,8 @@
             }
         };
 
-        // --- Google Drive Functions ---
-        const gapiLoaded = () => {
-            gapi.load('client', initializeGapiClient);
-        };
+        // --- Google Drive Integration ---
+        const gapiLoaded = () => gapi.load('client', initializeGapiClient);
 
         const initializeGapiClient = async () => {
             await gapi.client.init({
@@ -267,9 +265,8 @@
             });
             state.isGapiReady = true;
             updateAuthButtons();
-
-            // After GAPI is ready, check if user is already signed in.
-            // If so, load data from Drive. This handles page reloads.
+            // If a token exists, it means the user was previously signed in.
+            // Automatically try to load their data from Drive.
             if (gapi.client.getToken()) {
                 await loadFromDrive();
             }
@@ -279,7 +276,7 @@
             state.tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
                 scope: SCOPES,
-                callback: '', // defined later
+                callback: '', // Callback is handled dynamically
             });
             state.isGsiReady = true;
             updateAuthButtons();
@@ -290,14 +287,15 @@
                 alert('Google Drive連携機能を使用するには、コード内のAPI_KEYとCLIENT_IDを設定してください。');
                 return;
             }
+            if (!state.tokenClient) return;
+
             state.tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) {
-                    throw (resp);
-                }
+                if (resp.error !== undefined) throw (resp);
                 updateAuthButtons();
-                await loadFromDrive(); // Sync after sign-in
+                await loadFromDrive(); // Load data after successful sign-in
             };
 
+            // Prompt the user for consent if they are not already signed in
             if (gapi.client.getToken() === null) {
                 state.tokenClient.requestAccessToken({ prompt: 'consent' });
             } else {
@@ -317,6 +315,7 @@
         };
 
         const updateAuthButtons = () => {
+            if (!gapi.client) return;
             const token = gapi.client.getToken();
             if (token) {
                 authorizeButton.style.display = 'none';
@@ -338,15 +337,12 @@
                     driveFileId = response.result.files[0].id;
                 } else {
                     const createResponse = await gapi.client.drive.files.create({
-                        resource: {
-                            name: APP_FILENAME,
-                            mimeType: 'application/json',
-                        },
+                        resource: { name: APP_FILENAME, mimeType: 'application/json' },
                         fields: 'id',
                     });
                     driveFileId = createResponse.result.id;
-                    // Save current local data to the new file
-                    await saveToDrive();
+                    // Save current (potentially empty or local) data to the new file
+                    await saveToDrive(); 
                 }
             } catch (error) {
                 console.error('Error finding or creating app file:', error);
@@ -359,20 +355,8 @@
             const boundary = '-------314159265358979323846';
             const delimiter = "\r\n--" + boundary + "\r\n";
             const close_delim = "\r\n--" + boundary + "--";
-
-            const metadata = {
-                'mimeType': 'application/json'
-            };
-
-            const multipartRequestBody =
-                delimiter +
-                'Content-Type: application/json\r\n\r\n' +
-                JSON.stringify(metadata) +
-                delimiter +
-                'Content-Type: application/json\r\n\r\n' +
-                content +
-                close_delim;
-
+            const metadata = { 'mimeType': 'application/json' };
+            const multipartRequestBody = delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) + delimiter + 'Content-Type: application/json\r\n\r\n' + content + close_delim;
             await gapi.client.request({
                 path: `/upload/drive/v3/files/${driveFileId}`,
                 method: 'PATCH',
@@ -387,12 +371,9 @@
             if (!driveFileId) return;
             setSyncStatus('Google Driveから読込中...');
             try {
-                const response = await gapi.client.drive.files.get({
-                    fileId: driveFileId,
-                    alt: 'media',
-                });
+                const response = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
                 const driveData = response.result;
-                // Simple merge: Drive data overwrites local if it exists
+                // Check if the file has content and is a valid array
                 if (Array.isArray(driveData)) {
                     state.items = driveData;
                     localStorage.setItem('memoAppData', JSON.stringify(state.items));
@@ -402,10 +383,25 @@
             } catch (error) {
                 console.error('Error loading from Drive:', error);
                 setSyncStatus('Driveからの読込に失敗');
+                // If loading fails, fall back to local data
+                loadLocalData();
+                render();
             }
         };
 
-        // --- UI Rendering ---
+        const loadLocalData = () => {
+            const localData = localStorage.getItem('memoAppData');
+            if (localData) {
+                try { 
+                    state.items = JSON.parse(localData); 
+                } catch (e) { 
+                    console.error("Error parsing local data:", e); 
+                    state.items = []; 
+                }
+            }
+        };
+
+        // --- Rendering Functions ---
         const render = () => {
             if (state.currentView === 'home') {
                 homeView.classList.remove('hidden');
@@ -421,25 +417,14 @@
         
         const renderItemsList = () => {
             itemsList.innerHTML = '';
-            
             const filteredItems = state.items.filter(item => item.parentId === state.currentParentId);
-            
-            if (filteredItems.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-            }
+            emptyState.classList.toggle('hidden', filteredItems.length > 0);
 
-            // Sorting logic
             const sortedItems = [...filteredItems].sort((a, b) => {
-                // Pinned items always come first
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-
+                if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
                 const [key, order] = state.sortBy.split('_');
                 const valA = a[key];
                 const valB = b[key];
-
                 if (valA < valB) return order === 'asc' ? -1 : 1;
                 if (valA > valB) return order === 'asc' ? 1 : -1;
                 return 0;
@@ -447,7 +432,7 @@
 
             sortedItems.forEach(item => {
                 const itemEl = document.createElement('div');
-                itemEl.className = 'bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all duration-200 cursor-pointer relative group';
+                itemEl.className = 'bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 cursor-pointer relative group';
                 itemEl.dataset.id = item.id;
 
                 const isFolder = item.type === 'folder';
@@ -455,27 +440,24 @@
                     ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder mb-2 text-yellow-500"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>`
                     : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text mb-2 text-blue-500"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`;
                 
-                const pinIconColor = item.isPinned ? 'text-yellow-400' : 'text-slate-400 group-hover:text-slate-600';
+                const pinIconColor = item.isPinned ? 'text-yellow-400' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300';
+                
+                const editButtonHTML = `<button class="edit-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil text-slate-400 hover:text-blue-500 dark:hover:text-blue-400"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>`;
 
                 itemEl.innerHTML = `
                     ${icon}
-                    <h3 class="font-semibold truncate text-slate-800">${item.title || '無題'}</h3>
-                    <p class="text-xs text-slate-500 mt-1">${new Date(item.createdAt).toLocaleString('ja-JP')}</p>
+                    <h3 class="font-semibold truncate text-slate-800 dark:text-slate-200">${item.title || '無題'}</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${new Date(item.createdAt).toLocaleString('ja-JP')}</p>
                     <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="pin-btn p-1.5 rounded-full hover:bg-slate-200" data-id="${item.id}">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="lucide lucide-pin ${pinIconColor}"><path d="m20.3 5.7-1.1-1.1c-.4-.4-1-.4-1.4 0L12 10.3V3c0-.6-.4-1-1-1s-1 .4-1 1v7.3L4.8 4.6c-.4-.4-1-.4-1.4 0l-1.1 1.1c-.4.4-.4 1 0 1.4l6.7 6.7c.4.4 1 .4 1.4 0l1.1-1.1L18 19v2c0 .6.4 1 1 1s1-.4 1-1v-2l2.3-6.7c.2-.6 0-1.2-.5-1.6z"/></svg>
-                        </button>
-                        <button class="delete-btn p-1.5 rounded-full hover:bg-red-100" data-id="${item.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 text-slate-400 hover:text-red-500"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                        </button>
-                    </div>
-                `;
-
+                        ${editButtonHTML}
+                        <button class="pin-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="lucide lucide-pin ${pinIconColor}"><path d="m20.3 5.7-1.1-1.1c-.4-.4-1-.4-1.4 0L12 10.3V3c0-.6-.4-1-1-1s-1 .4-1 1v7.3L4.8 4.6c-.4-.4-1-.4-1.4 0l-1.1 1.1c-.4-.4-.4 1 0 1.4l6.7 6.7c.4.4 1 .4 1.4 0l1.1-1.1L18 19v2c0 .6.4 1 1 1s1-.4 1-1v-2l2.3-6.7c.2-.6 0-1.2-.5-1.6z"/></svg></button>
+                        <button class="delete-btn p-1.5 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 text-slate-400 hover:text-red-500"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
+                    </div>`;
+                
                 itemEl.addEventListener('click', (e) => {
-                    if (e.target.closest('.delete-btn') || e.target.closest('.pin-btn')) return;
+                    if (e.target.closest('.delete-btn, .pin-btn, .edit-btn')) return;
                     handleItemClick(item.id);
                 });
-                
                 itemsList.appendChild(itemEl);
             });
         };
@@ -489,31 +471,35 @@
         };
 
         const updateBreadcrumb = () => {
-            let path = [{ id: null, title: 'ホーム' }];
+            const path = [];
             let currentId = state.currentParentId;
+
             while (currentId) {
                 const parent = state.items.find(item => item.id === currentId);
                 if (parent) {
                     path.unshift({ id: parent.id, title: parent.title });
                     currentId = parent.parentId;
                 } else {
-                    break;
+                    break; 
                 }
             }
 
+            path.unshift({ id: null, title: 'ホーム' });
+
             breadcrumb.innerHTML = path.map((p, index) => {
                 if (index === path.length - 1) {
-                    return `<span class="font-bold text-slate-800">${p.title}</span>`;
+                    return `<span class="font-bold text-slate-800 dark:text-slate-200">${p.title}</span>`;
                 }
-                return `<a href="#" class="hover:underline text-blue-600" data-id="${p.id}">${p.title}</a>`;
-            }).join('<span class="mx-2 text-slate-400">/</span>');
+                return `<a href="#" class="hover:underline text-blue-600 dark:text-blue-400" data-id="${p.id}">${p.title}</a>`;
+            }).join('<span class="mx-2 text-slate-400 dark:text-slate-500">/</span>');
         };
 
-        // --- Event Handlers ---
+
+        // --- Event Handlers & Logic ---
         const handleItemClick = (id) => {
             const item = state.items.find(i => i.id === id);
             if (!item) return;
-
+            
             if (item.type === 'folder') {
                 state.currentParentId = id;
             } else {
@@ -524,11 +510,10 @@
         };
 
         const createItem = (type) => {
-            const title = type === 'folder' ? '新しいフォルダ' : '無題のメモ';
             const newItem = {
                 id: generateUUID(),
                 type: type,
-                title: title,
+                title: type === 'folder' ? '新しいフォルダ' : '無題のメモ',
                 content: '',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
@@ -552,25 +537,20 @@
                 item.content = editor.innerHTML;
                 item.updatedAt = new Date().toISOString();
                 
-                // Debounce saving
                 clearTimeout(saveTimeout);
                 setSyncStatus('変更あり');
-                saveTimeout = setTimeout(() => {
-                    saveData();
-                }, 1000);
+                saveTimeout = setTimeout(() => saveData(), 1000);
             }
         };
         
-        const setSyncStatus = (text) => {
-            syncStatus.textContent = text;
-        };
-
+        const setSyncStatus = (text) => syncStatus.textContent = text;
+        
         const showModal = (modal) => {
             modal.classList.remove('hidden');
             modal.querySelector('div').classList.add('modal-enter-active');
             modal.querySelector('div').classList.remove('modal-enter');
         };
-
+        
         const hideModal = (modal) => {
             const content = modal.querySelector('div');
             content.classList.add('modal-exit-active');
@@ -582,16 +562,18 @@
         };
 
         // --- Event Listeners ---
-        createBtn.addEventListener('click', () => showModal(createModal));
+        createBtn.addEventListener('click', () => {
+            // **FIX:** Hide create folder button if not in root directory
+            if (state.currentParentId !== null) {
+                createFolderBtn.style.display = 'none';
+            } else {
+                createFolderBtn.style.display = 'flex';
+            }
+            showModal(createModal);
+        });
         cancelCreateBtn.addEventListener('click', () => hideModal(createModal));
-        createNoteBtn.addEventListener('click', () => {
-            hideModal(createModal);
-            createItem('note');
-        });
-        createFolderBtn.addEventListener('click', () => {
-            hideModal(createModal);
-            createItem('folder');
-        });
+        createNoteBtn.addEventListener('click', () => { hideModal(createModal); createItem('note'); });
+        createFolderBtn.addEventListener('click', () => { hideModal(createModal); createItem('folder'); });
 
         backToHomeBtn.addEventListener('click', () => {
             state.currentView = 'home';
@@ -601,11 +583,7 @@
 
         noteTitleInput.addEventListener('input', updateNote);
         editor.addEventListener('input', updateNote);
-
-        sortSelect.addEventListener('change', (e) => {
-            state.sortBy = e.target.value;
-            render();
-        });
+        sortSelect.addEventListener('change', (e) => { state.sortBy = e.target.value; render(); });
 
         document.querySelectorAll('.editor-tool-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -616,49 +594,87 @@
         });
 
         breadcrumb.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
+            const link = e.target.closest('a');
+            if (link) {
                 e.preventDefault();
-                const id = e.target.dataset.id;
+                const id = link.dataset.id;
                 state.currentParentId = id === 'null' ? null : id;
                 render();
             }
         });
 
         itemsList.addEventListener('click', (e) => {
-            const pinBtn = e.target.closest('.pin-btn');
-            if (pinBtn) {
-                const id = pinBtn.dataset.id;
+            const targetBtn = e.target.closest('.pin-btn, .delete-btn, .edit-btn');
+            if (!targetBtn) return;
+            const id = targetBtn.dataset.id;
+            
+            if (targetBtn.classList.contains('pin-btn')) {
                 const item = state.items.find(i => i.id === id);
                 if (item) {
                     item.isPinned = !item.isPinned;
                     saveData();
                     render();
                 }
-            }
-
-            const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                state.deleteCandidateId = deleteBtn.dataset.id;
+            } else if (targetBtn.classList.contains('delete-btn')) {
+                state.deleteCandidateId = id;
                 showModal(deleteModal);
+            } else if (targetBtn.classList.contains('edit-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const itemEl = targetBtn.closest('[data-id]');
+                if (itemEl.querySelector('input')) return;
+
+                const titleEl = itemEl.querySelector('h3');
+                if (!titleEl) return;
+
+                const originalTitle = titleEl.textContent;
+                const inputEl = document.createElement('input');
+                inputEl.type = 'text';
+                inputEl.value = originalTitle;
+                inputEl.className = 'font-semibold text-slate-800 bg-white dark:bg-slate-700 dark:text-slate-200 border border-blue-400 rounded w-full px-1 -my-0.5';
+                
+                const finishEditing = () => {
+                    const newTitle = inputEl.value.trim();
+                    const itemToUpdate = state.items.find(i => i.id === id);
+
+                    if (itemToUpdate && newTitle && newTitle !== originalTitle) {
+                        itemToUpdate.title = newTitle;
+                        itemToUpdate.updatedAt = new Date().toISOString();
+                        saveData();
+                    }
+                    // Always re-render to remove the input field
+                    render();
+                };
+                
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Enter') {
+                        inputEl.blur();
+                    } else if (e.key === 'Escape') {
+                        // To cancel, we just re-render without saving
+                        inputEl.removeEventListener('blur', finishEditing); // prevent saving on blur
+                        render();
+                    }
+                };
+
+                inputEl.addEventListener('blur', finishEditing, { once: true });
+                inputEl.addEventListener('keydown', handleKeyDown);
+
+                titleEl.replaceWith(inputEl);
+                inputEl.focus();
+                inputEl.select();
             }
         });
-
-        cancelDeleteBtn.addEventListener('click', () => {
-            hideModal(deleteModal);
-            state.deleteCandidateId = null;
-        });
-
+        
+        cancelDeleteBtn.addEventListener('click', () => { hideModal(deleteModal); state.deleteCandidateId = null; });
         confirmDeleteBtn.addEventListener('click', () => {
             if (state.deleteCandidateId) {
-                // Recursively delete folder contents
                 const deleteIds = [state.deleteCandidateId];
                 const findChildren = (parentId) => {
                     state.items.forEach(item => {
                         if (item.parentId === parentId) {
                             deleteIds.push(item.id);
-                            if (item.type === 'folder') {
-                                findChildren(item.id);
-                            }
+                            if (item.type === 'folder') findChildren(item.id);
                         }
                     });
                 };
@@ -672,26 +688,30 @@
             state.deleteCandidateId = null;
         });
         
-        // Google Auth Listeners
         authorizeButton.addEventListener('click', handleAuthClick);
         signoutButton.addEventListener('click', handleSignoutClick);
-
+        
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            themeIconLight.classList.toggle('hidden', isDark);
+            themeIconDark.classList.toggle('hidden', !isDark);
+        });
 
         // --- Initialization ---
         const init = () => {
-            // Load from local storage first to render the UI immediately
-            const localData = localStorage.getItem('memoAppData');
-            if (localData) {
-                try {
-                    state.items = JSON.parse(localData);
-                } catch (e) {
-                    console.error("Error parsing local data:", e);
-                    state.items = []; // Reset if data is corrupt
-                }
-            }
-            render(); // Render whatever we have locally
+            loadLocalData();
+            
+            const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            
+            themeIconLight.classList.toggle('hidden', isDark);
+            themeIconDark.classList.toggle('hidden', !isDark);
+            
+            render();
 
-            // Load Google API scripts dynamically
+            // Dynamically load Google API scripts
             const gapiScript = document.createElement('script');
             gapiScript.src = 'https://apis.google.com/js/api.js';
             gapiScript.onload = gapiLoaded;
