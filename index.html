@@ -126,18 +126,21 @@
                 <input type="text" id="note-title" placeholder="タイトルを入力..." class="text-3xl font-bold w-full p-2 mb-4 bg-transparent border-b-2 border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors dark:text-slate-100">
                 
                 <!-- Editor Toolbar -->
-                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-t-lg border border-b-0 border-slate-200 dark:border-slate-700">
-                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="bold">
+                <div class="flex items-center flex-wrap gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-t-lg border border-b-0 border-slate-200 dark:border-slate-700">
+                    <button class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="bold">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg>
                     </button>
-                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="italic">
+                    <button class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="italic">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
                     </button>
+                    <button id="create-link-btn" class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"/></svg>
+                    </button>
                     <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
-                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="undo">
+                    <button class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="undo">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a8.5 8.5 0 1 1-4.13 15.87"/></svg>
                     </button>
-                    <button class="editor-tool-btn p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="redo">
+                    <button class="editor-tool-btn flex items-center justify-center p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700" data-command="redo">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo-2"><path d="M15 14 20 9l-5-5"/><path d="M20 9H9.5A8.5 8.5 0 1 0 13.6 21.8"/></svg>
                     </button>
                 </div>
@@ -174,6 +177,39 @@
             <div class="flex justify-center gap-4">
                 <button id="cancel-delete-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
                 <button id="confirm-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32">削除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div id="rename-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
+            <h3 class="text-xl font-bold mb-4 text-center dark:text-slate-100">名前の変更</h3>
+            <input type="text" id="rename-input" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-slate-200">
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="cancel-rename-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
+                <button id="confirm-rename-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32">変更</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Modal -->
+    <div id="link-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm modal-enter">
+            <h3 class="text-xl font-bold mb-4 text-center dark:text-slate-100">ハイパーリンクの挿入</h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="link-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">表示するテキスト</label>
+                    <input type="text" id="link-text" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-slate-200">
+                </div>
+                <div>
+                    <label for="link-url" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">URL</label>
+                    <input type="url" id="link-url" placeholder="https://example.com" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-slate-200">
+                </div>
+            </div>
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="cancel-link-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors w-32">キャンセル</button>
+                <button id="confirm-link-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors w-32">OK</button>
             </div>
         </div>
     </div>
@@ -215,6 +251,17 @@
         const deleteModal = document.getElementById('delete-modal');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const renameModal = document.getElementById('rename-modal');
+        const renameInput = document.getElementById('rename-input');
+        const cancelRenameBtn = document.getElementById('cancel-rename-btn');
+        const confirmRenameBtn = document.getElementById('confirm-rename-btn');
+        const linkModal = document.getElementById('link-modal');
+        const linkTextInput = document.getElementById('link-text');
+        const linkUrlInput = document.getElementById('link-url');
+        const cancelLinkBtn = document.getElementById('cancel-link-btn');
+        const confirmLinkBtn = document.getElementById('confirm-link-btn');
+        const createLinkBtn = document.getElementById('create-link-btn');
+
 
         // Google Auth Buttons
         const authorizeButton = document.getElementById('authorize_button');
@@ -231,9 +278,11 @@
             isGsiReady: false,
             tokenClient: null,
             deleteCandidateId: null,
+            renameCandidateId: null,
         };
         
         let saveTimeout;
+        let savedSelection = null;
 
         const generateUUID = () => crypto.randomUUID();
 
@@ -450,7 +499,7 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${new Date(item.createdAt).toLocaleString('ja-JP')}</p>
                     <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         ${editButtonHTML}
-                        <button class="pin-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="lucide lucide-pin ${pinIconColor}"><path d="m20.3 5.7-1.1-1.1c-.4-.4-1-.4-1.4 0L12 10.3V3c0-.6-.4-1-1-1s-1 .4-1 1v7.3L4.8 4.6c-.4-.4-1-.4-1.4 0l-1.1 1.1c-.4-.4-.4 1 0 1.4l6.7 6.7c.4.4 1 .4 1.4 0l1.1-1.1L18 19v2c0 .6.4 1 1 1s1-.4 1-1v-2l2.3-6.7c.2-.6 0-1.2-.5-1.6z"/></svg></button>
+                        <button class="pin-btn p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="${pinIconColor}"><path d="M16 3.1c-.6-1-1.8-1.4-2.8-1.1-1 .3-1.8 1.1-2.1 2.1-.3 1 .1 2.2 1.1 2.8l-5.6 5.6c-.4.4-.4 1 0 1.4l2.8 2.8c.4.4 1 .4 1.4 0l5.6-5.6c.7.9 1.8 1.2 2.8 1.1 1-.3 1.8-1.1 2.1-2.1.3-1-.1-2.2-1.1-2.8L16 3.1zM12 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></button>
                         <button class="delete-btn p-1.5 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" data-id="${item.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 text-slate-400 hover:text-red-500"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
                     </div>`;
                 
@@ -542,6 +591,25 @@
                 saveTimeout = setTimeout(() => saveData(), 1000);
             }
         };
+
+        const updateToolbarState = () => {
+            if (state.currentView !== 'editor') return;
+            try {
+                const isBold = document.queryCommandState('bold');
+                const isItalic = document.queryCommandState('italic');
+
+                const boldBtn = document.querySelector('.editor-tool-btn[data-command="bold"]');
+                const italicBtn = document.querySelector('.editor-tool-btn[data-command="italic"]');
+
+                boldBtn.classList.toggle('bg-blue-200', isBold);
+                boldBtn.classList.toggle('dark:bg-blue-700', isBold);
+
+                italicBtn.classList.toggle('bg-blue-200', isItalic);
+                italicBtn.classList.toggle('dark:bg-blue-700', isItalic);
+            } catch (e) {
+                console.error("Could not update toolbar state:", e);
+            }
+        };
         
         const setSyncStatus = (text) => syncStatus.textContent = text;
         
@@ -563,7 +631,6 @@
 
         // --- Event Listeners ---
         createBtn.addEventListener('click', () => {
-            // **FIX:** Hide create folder button if not in root directory
             if (state.currentParentId !== null) {
                 createFolderBtn.style.display = 'none';
             } else {
@@ -585,12 +652,77 @@
         editor.addEventListener('input', updateNote);
         sortSelect.addEventListener('change', (e) => { state.sortBy = e.target.value; render(); });
 
-        document.querySelectorAll('.editor-tool-btn').forEach(btn => {
+        document.querySelectorAll('.editor-tool-btn[data-command]').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.execCommand(btn.dataset.command, false, null);
                 editor.focus();
                 updateNote();
+                updateToolbarState(); // Update toolbar after command
             });
+        });
+
+        createLinkBtn.addEventListener('click', () => {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                savedSelection = selection.getRangeAt(0).cloneRange();
+                linkTextInput.value = selection.toString();
+            } else {
+                savedSelection = null;
+                linkTextInput.value = '';
+            }
+            linkUrlInput.value = '';
+            showModal(linkModal);
+            linkUrlInput.focus();
+        });
+
+        confirmLinkBtn.addEventListener('click', () => {
+            let url = linkUrlInput.value.trim();
+            let text = linkTextInput.value.trim();
+
+            if (!url || !text) return;
+
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+            
+            editor.focus();
+
+            if (savedSelection) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(savedSelection);
+            }
+            
+            const linkHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+            document.execCommand('insertHTML', false, linkHTML);
+            
+            updateNote();
+            hideModal(linkModal);
+            savedSelection = null;
+        });
+
+        cancelLinkBtn.addEventListener('click', () => {
+            hideModal(linkModal);
+            savedSelection = null;
+        });
+
+        linkUrlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                confirmLinkBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelLinkBtn.click();
+            }
+        });
+
+
+        // Add listeners to update the toolbar state based on cursor position
+        editor.addEventListener('keyup', updateToolbarState);
+        editor.addEventListener('mouseup', updateToolbarState);
+        editor.addEventListener('focus', updateToolbarState);
+        document.addEventListener('selectionchange', () => {
+            if (document.activeElement === editor) {
+                updateToolbarState();
+            }
         });
 
         breadcrumb.addEventListener('click', (e) => {
@@ -606,6 +738,10 @@
         itemsList.addEventListener('click', (e) => {
             const targetBtn = e.target.closest('.pin-btn, .delete-btn, .edit-btn');
             if (!targetBtn) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+
             const id = targetBtn.dataset.id;
             
             if (targetBtn.classList.contains('pin-btn')) {
@@ -619,50 +755,13 @@
                 state.deleteCandidateId = id;
                 showModal(deleteModal);
             } else if (targetBtn.classList.contains('edit-btn')) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const itemEl = targetBtn.closest('[data-id]');
-                if (itemEl.querySelector('input')) return;
-
-                const titleEl = itemEl.querySelector('h3');
-                if (!titleEl) return;
-
-                const originalTitle = titleEl.textContent;
-                const inputEl = document.createElement('input');
-                inputEl.type = 'text';
-                inputEl.value = originalTitle;
-                inputEl.className = 'font-semibold text-slate-800 bg-white dark:bg-slate-700 dark:text-slate-200 border border-blue-400 rounded w-full px-1 -my-0.5';
-                
-                const finishEditing = () => {
-                    const newTitle = inputEl.value.trim();
-                    const itemToUpdate = state.items.find(i => i.id === id);
-
-                    if (itemToUpdate && newTitle && newTitle !== originalTitle) {
-                        itemToUpdate.title = newTitle;
-                        itemToUpdate.updatedAt = new Date().toISOString();
-                        saveData();
-                    }
-                    // Always re-render to remove the input field
-                    render();
-                };
-                
-                const handleKeyDown = (e) => {
-                    if (e.key === 'Enter') {
-                        inputEl.blur();
-                    } else if (e.key === 'Escape') {
-                        // To cancel, we just re-render without saving
-                        inputEl.removeEventListener('blur', finishEditing); // prevent saving on blur
-                        render();
-                    }
-                };
-
-                inputEl.addEventListener('blur', finishEditing, { once: true });
-                inputEl.addEventListener('keydown', handleKeyDown);
-
-                titleEl.replaceWith(inputEl);
-                inputEl.focus();
-                inputEl.select();
+                const itemToEdit = state.items.find(i => i.id === id);
+                if (!itemToEdit) return;
+                state.renameCandidateId = id;
+                renameInput.value = itemToEdit.title;
+                showModal(renameModal);
+                renameInput.focus();
+                renameInput.select();
             }
         });
         
@@ -686,6 +785,34 @@
             }
             hideModal(deleteModal);
             state.deleteCandidateId = null;
+        });
+
+        cancelRenameBtn.addEventListener('click', () => {
+            hideModal(renameModal);
+            state.renameCandidateId = null;
+        });
+
+        confirmRenameBtn.addEventListener('click', () => {
+            if (!state.renameCandidateId) return;
+            const itemToUpdate = state.items.find(i => i.id === state.renameCandidateId);
+            const newTitle = renameInput.value.trim();
+
+            if (itemToUpdate && newTitle && newTitle !== itemToUpdate.title) {
+                itemToUpdate.title = newTitle;
+                itemToUpdate.updatedAt = new Date().toISOString();
+                saveData();
+                render();
+            }
+            hideModal(renameModal);
+            state.renameCandidateId = null;
+        });
+
+        renameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                confirmRenameBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelRenameBtn.click();
+            }
         });
         
         authorizeButton.addEventListener('click', handleAuthClick);
